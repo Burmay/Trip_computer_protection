@@ -5,19 +5,24 @@ using System;
 
 public class WaweInteractor : Interactor
 {
+    bool onSpawnEnd = false;
+
     private List<GameObject> enemies;
     public List<GameObject> Enemies
     {
         get
         {
-            if(enemies == null) return null;
-            enemies.RemoveAll(s => s == null); return enemies;
+            if (enemies == null) return null;
+            enemies.RemoveAll(s => s == null);
+            if (enemies.Count == 0 && onSpawnEnd == true) { EndWawe(); return null; }
+            return enemies;
         }
         private set { enemies = value; }
     }
 
-    float timeBetweenWave = 5f;
-    float timeBetweenSpawn = 1f;
+    float timeBetweenSpawn = 0.2f;
+    float countEnemy = 80f;
+
     Transform spawnPointT;
     string ENEMY_PATH = "Prefabs/Enemy/Enemy";
     GameObject enemyPtefab;
@@ -34,32 +39,37 @@ public class WaweInteractor : Interactor
         var obj = GameObject.FindGameObjectWithTag("SpawnPoint");
         spawnPointT = obj.transform;
         enemyPtefab = Resources.Load<GameObject>(ENEMY_PATH);
-        spawnRoutine = Coroutines.StartRoutine(SpawnEnemyRoutine());
+        // test
+        StartWawe();
     }
 
 
-    private void StartSpawnRoutine()
+    public void StartWawe()
     {
+        onSpawnEnd = false;
         spawnRoutine = Coroutines.StartRoutine(SpawnEnemyRoutine());
+    }
+
+    private void EndWawe()
+    {
+        Debug.Log("Tactical phase ON");
+    }
+
+    private void ShowBuildMenu()
+    {
+
     }
 
     private IEnumerator SpawnEnemyRoutine()
     {
-        for(int i = 0; i < timeBetweenSpawn; i++)
+        for(int i = 0; i < countEnemy; i++)
         {
             yield return new WaitForSeconds(timeBetweenSpawn);
             enemies.Add(Instantiate(enemyPtefab, spawnPointT.position, spawnPointT.rotation));
         }
 
-        //
-        ReloadSpawnRoutine();
-    }
-
-
-    void ReloadSpawnRoutine()
-    {
+        onSpawnEnd = true;
         Coroutines.StopRoutine(spawnRoutine);
-        StartSpawnRoutine();
     }
 
     //private void ActionOn(Action action)

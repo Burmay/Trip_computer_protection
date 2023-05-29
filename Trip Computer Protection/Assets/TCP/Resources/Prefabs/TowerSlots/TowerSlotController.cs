@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class TowerSlotController : MonoBehaviour
 {
@@ -21,7 +22,10 @@ public class TowerSlotController : MonoBehaviour
 
      void OnMouseEnter()
     {
-        render.material.color = selectionColor;
+        if (buildInteractor.CanBuild)
+        {
+            render.material.color = selectionColor;
+        }
     }
 
     void OnMouseExit()
@@ -31,7 +35,9 @@ public class TowerSlotController : MonoBehaviour
 
     private void OnMouseDown()
     {
-        if (turret != null) return;
+        if (turret != null || buildInteractor.turretToBuild.Prefab == null) return;
+        if (EventSystem.current.IsPointerOverGameObject()) return;
+
         turret =  buildInteractor.BuildTurret(this);
     }
 

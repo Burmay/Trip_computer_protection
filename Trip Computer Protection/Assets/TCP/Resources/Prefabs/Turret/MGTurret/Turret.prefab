@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2094124826982261549}
-  - component: {fileID: 5853887485543586736}
+  - component: {fileID: 2401630945907938681}
   m_Layer: 0
   m_Name: Turret
   m_TagString: Untagged
@@ -25,7 +25,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1604411506545064343}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.55, z: 1.29}
+  m_LocalPosition: {x: 0, y: 0, z: 1.29}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -34,7 +34,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &5853887485543586736
+--- !u!114 &2401630945907938681
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -43,17 +43,18 @@ MonoBehaviour:
   m_GameObject: {fileID: 1604411506545064343}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a5a2c6dadd10d6846b5176a01dd28bc4, type: 3}
+  m_Script: {fileID: 11500000, guid: ef61a4b3d6ced7d4e93c05ed74e5a86c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  range: 3
-  angularSpeed: 10
-  fireRate: 0.35
+  range: 4
+  angularSpeed: 5
+  fireRate: 5
   fireCountdown: 0
   clipSize: 1
+  damage: 2
   partToRotate: {fileID: 1258722258311665234}
   firePoint: {fileID: 4993647603458871447}
-  MachineGun_Bullet_Path: Prefabs/Shell/MachineGun/MachineGunBullet
+  shotEffect: {fileID: 0}
 --- !u!1 &1707301979004429952
 GameObject:
   m_ObjectHideFlags: 0

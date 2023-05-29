@@ -14,6 +14,8 @@ public class MainSceneConfigurator : SceneConfig
         var interactorsRoll = new Dictionary<Type, Interactor>();
         this.CreateInteractor<WaweInteractor>(interactorsRoll);
         this.CreateInteractor<BuildInteractor>(interactorsRoll);
+        this.CreateInteractor<AmmunitionInteractor>(interactorsRoll);
+        this.CreateInteractor<InventoryInteractor>(interactorsRoll);
         // Int
 
         return interactorsRoll;

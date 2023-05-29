@@ -1,22 +1,26 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 public class Bullet : MonoBehaviour
 {
-    [SerializeField] float speed = 70f;
+    [SerializeField] protected float speed = 70f;
+    int damage;
     Transform target;
     Vector3 dir;
-    [SerializeField] GameObject hitEffect;
+    [SerializeField] protected GameObject hitEffect;
 
-    public void Init(Transform target)
+    public void Init(Transform target, int damage)
     {
         this.target = target;
-        
+        this.damage = damage;
     }
 
-    private void Update()
+    protected virtual void Update()
     {
+        transform.LookAt(target);
+
         if (target == null)
         {
             GameObject.Destroy(gameObject, 3f);
@@ -33,16 +37,21 @@ public class Bullet : MonoBehaviour
         transform.Translate(dir.normalized * distancePerFrame, Space.World);
     }
 
-    void Hit()
+    protected virtual void Hit()
     {
         HitEffect();
         GameObject.Destroy(gameObject);
 
-        //Not realiset damage!
-        GameObject.Destroy(target.gameObject);
+        Damage(target);
     }
 
-    void HitEffect()
+    protected virtual void Damage(Transform target)
+    {
+        EnemyController enemy = target.GetComponent<EnemyController>();
+        enemy.TakeDamage(damage);
+    }
+
+    protected virtual void HitEffect()
     {
         var effect = Instantiate(hitEffect, transform.position, Quaternion.identity);
         GameObject.Destroy(effect, 2f);
