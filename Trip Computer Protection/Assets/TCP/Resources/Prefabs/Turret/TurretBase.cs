@@ -2,8 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using UnityEngine.UI;
 
-public class TurretController : MonoBehaviour
+public class TurretBase : MonoBehaviour
 {
     [Header("Attributes")]
 
@@ -13,26 +14,36 @@ public class TurretController : MonoBehaviour
     [SerializeField] protected float fireCountdown = 0f;
     [SerializeField] protected int clipSize = 1;
     [SerializeField] protected int damage;
+    [SerializeField] protected int costReload;
+
+    [Header("Ammo")]
+    [SerializeField] protected int maxAmmo;
+    [SerializeField] protected int sleeveSize;
 
     [Header("Unity Setup")]
 
-    InventoryInteractor inventoryInteractor;
-    [SerializeField]Transform partToRotate;
+    [SerializeField] Transform partToRotate;
     [SerializeField] protected Transform firePoint;
+    [SerializeField] protected GameObject shotEffect;
+    [SerializeField] Image ammoBar;
+    protected float ammo;
     protected string BULLET_PATH;
     protected Bullet bulletPrefab;
     protected Transform target;
     protected WaweInteractor waweInteractor;
     protected BuildInteractor buildInteractor;
     List<GameObject> enemies;
-    List <Bullet> bullets;
+    List<Bullet> bullets;
     protected float shortestDistance;
-    [SerializeField] protected GameObject shotEffect;
+    InventoryInteractor inventoryInteractor;
+    public bool off { get; protected set; }
 
 
     protected virtual void Start()
     {
         LoadResources();
+        ammo = maxAmmo;
+        off = false;
     }
 
     protected virtual void LoadResources()
@@ -46,6 +57,7 @@ public class TurretController : MonoBehaviour
 
     protected virtual void Update()
     {
+        if (off) return;
         FindNearbyTarget();
         Spread();
         if (CheckOpportunityShot())
@@ -57,13 +69,21 @@ public class TurretController : MonoBehaviour
 
     protected virtual bool CheckOpportunityShot()
     {
+        //Check Reload
         if(fireCountdown <= 0)
         {
-            if(target != null && shortestDistance <= range)
+            // Check target & distance
+            if (target != null && shortestDistance <= range)
             {
+                // Check the turn on target 
                 if (!TargetAcquired()) return false;
                 fireCountdown = 1f / fireRate;
-                return true;
+                // Check ammo & spend ammo
+                if (ammo > 0)
+                {
+                    SpendAmmo(); return true;
+                }
+                else return false;
             }
             return false;
         }
@@ -72,6 +92,12 @@ public class TurretController : MonoBehaviour
             fireCountdown -= Time.deltaTime;
             return false;
         }
+    }
+
+    protected virtual void SpendAmmo()
+    {
+        ammo -= 1;
+        DrawAmmo();
     }
 
     protected virtual void Shoot()
@@ -102,6 +128,12 @@ public class TurretController : MonoBehaviour
 
     }
 
+    protected void DrawAmmo()
+    {
+        ammoBar.fillAmount = (float)ammo / (float)maxAmmo;
+        if (ammo == 0) off = true;
+    }
+
     protected virtual void FindNearbyTarget()
     {
         enemies = waweInteractor.Enemies;
@@ -130,10 +162,26 @@ public class TurretController : MonoBehaviour
     }
 
     protected virtual void OnDrawGizmosSelected()
-     {
+    {
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, range);
-     }
+    }
+
+    public void Reload()
+    {
+        if (inventoryInteractor.SpendSupplies(costReload))
+        {
+            ammo = maxAmmo;
+            off = false;
+        }
+    }
+
+    public void WaweReload()
+    {
+        ammo = maxAmmo;
+        DrawAmmo();
+        if (off) off = !off;
+    }
 }
 
 public enum TurretType

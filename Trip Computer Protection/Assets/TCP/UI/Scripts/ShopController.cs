@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class ShopController : MonoBehaviour
 {
@@ -12,6 +13,7 @@ public class ShopController : MonoBehaviour
         inventoryInteractor = Game.GetInteractor<InventoryInteractor>();
         buildInteractor = Game.GetInteractor<BuildInteractor>();
     }
+
 
     public void ChoiceMGTurret()
     {

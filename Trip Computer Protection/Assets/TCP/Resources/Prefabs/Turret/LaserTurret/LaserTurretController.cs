@@ -2,12 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class LaserTurretController : TurretController
+public class LaserTurretController : TurretBase
 {
     LineRenderer lineRenderer;
     GameObject activeShotEffect;
     [SerializeField] float slowAmount = 0.7f;
     [SerializeField] bool IfSlow;
+    [SerializeField] float consumptionAmmoPerSecond;
 
     EnemyController targetEnemy;
 
@@ -20,11 +21,14 @@ public class LaserTurretController : TurretController
 
     protected override void Update()
     {
+        if (off) { OffLaser(); return; }
         base.FindNearbyTarget();
-        if(target !=  null ) targetEnemy = target.GetComponent<EnemyController>();
+        if (target != null) targetEnemy = target.GetComponent<EnemyController>();
         base.Spread();
         Laser();
     }
+
+    
 
     void Laser()
     {
@@ -33,22 +37,37 @@ public class LaserTurretController : TurretController
         lineRenderer.SetPosition(1, target.position);
         ShotEffect();
         TakeDamage();
-        if(IfSlow) Slowtarget();
+        if (IfSlow) SlowTarget();
+        SpendAmmo();
     }
 
     bool LaserState()
     {
-        if (target == null || shortestDistance > range || !base.TargetAcquired())
+        if (target == null || shortestDistance > range || !base.TargetAcquired() || base.ammo <= 0)
         {
-            if(lineRenderer.enabled) lineRenderer.enabled = false;
+            OffLaser();
             if(activeShotEffect != null) { Destroy(activeShotEffect); }
             return false;
         }
         else
         {
             if(!lineRenderer.enabled) lineRenderer.enabled = true;
+            SpendAmmo();
             return true;
         }
+    }
+
+    void OffLaser()
+    {
+        if (lineRenderer.enabled) lineRenderer.enabled = false;
+        GameObject.Destroy(activeShotEffect);
+    }
+
+    protected override void SpendAmmo()
+    {
+        base.ammo -= consumptionAmmoPerSecond * Time.deltaTime;
+        base.DrawAmmo();
+        if(ammo <= 0) off = true;
     }
 
     protected override void ShotEffect()
@@ -67,7 +86,7 @@ public class LaserTurretController : TurretController
         targetEnemy.TakeDamage(damage * Time.deltaTime);
     }
 
-    void Slowtarget()
+    void SlowTarget()
     {
         targetEnemy.Slow(slowAmount);
     }

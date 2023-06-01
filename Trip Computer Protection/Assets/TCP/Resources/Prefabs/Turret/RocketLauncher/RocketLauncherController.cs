@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class RocketLauncherController : TurretController
+public class RocketLauncherController : TurretBase
 {
     protected override void Start()
     {

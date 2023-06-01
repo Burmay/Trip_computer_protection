@@ -3,16 +3,21 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
+
 public class WaweInteractor : Interactor
 {
+    int waweNumber;
+    float timeBetweenSpawn = 0.2f;
+    int countEnemy = 0;
     bool onSpawnEnd = false;
+    bool tacticalPhase = true;
 
     private List<GameObject> enemies;
     public List<GameObject> Enemies
     {
         get
         {
-            if (enemies == null) return null;
+            if (enemies == null) { EndWawe(); return null; }
             enemies.RemoveAll(s => s == null);
             if (enemies.Count == 0 && onSpawnEnd == true) { EndWawe(); return null; }
             return enemies;
@@ -20,13 +25,10 @@ public class WaweInteractor : Interactor
         private set { enemies = value; }
     }
 
-    float timeBetweenSpawn = 0.2f;
-    float countEnemy = 80f;
-
+    BuildInteractor buildInteractor;
     Transform spawnPointT;
     string ENEMY_PATH = "Prefabs/Enemy/Enemy";
     GameObject enemyPtefab;
-
     Coroutine spawnRoutine;
 
     public override void OnCreate()
@@ -36,28 +38,49 @@ public class WaweInteractor : Interactor
 
     public override void OnStart()
     {
+        Network();
+        waweNumber = 0;
+        // test
+    }
+
+    void Network()
+    {
+        enemyPtefab = Resources.Load<GameObject>(ENEMY_PATH);
+        buildInteractor = Game.GetInteractor<BuildInteractor>();
         var obj = GameObject.FindGameObjectWithTag("SpawnPoint");
         spawnPointT = obj.transform;
-        enemyPtefab = Resources.Load<GameObject>(ENEMY_PATH);
-        // test
-        StartWawe();
+
+        GlobalEventManager.TacticalPhaseOn += ReloadTurrets;
+        GlobalEventManager.TacticalPhaseOff += StartWawe;
     }
 
 
     public void StartWawe()
     {
+        waweNumber++;
+        WaweData.WaveStats(waweNumber);
+        countEnemy = WaweData.TestEnemy.Count;
+        tacticalPhase = false;
         onSpawnEnd = false;
         spawnRoutine = Coroutines.StartRoutine(SpawnEnemyRoutine());
     }
 
     private void EndWawe()
     {
+        if (tacticalPhase) return;
+
         Debug.Log("Tactical phase ON");
+        GlobalEventManager.SendTacticalPhaseOn();
+
+        tacticalPhase = true;
     }
 
-    private void ShowBuildMenu()
+    void ReloadTurrets()
     {
-
+        foreach(TurretBase turret in buildInteractor.turrets)
+        {
+            turret.WaweReload();
+        }
     }
 
     private IEnumerator SpawnEnemyRoutine()

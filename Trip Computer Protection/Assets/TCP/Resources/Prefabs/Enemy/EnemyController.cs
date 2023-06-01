@@ -10,14 +10,17 @@ public class EnemyController : MonoBehaviour
     [SerializeField] float offset = 0.2f;
     [SerializeField] float health;
     [SerializeField] float startHealth = 100;
+    [SerializeField] int suppliesValue;
 
     Transform target;
     int wavePointIndex = 0;
     [SerializeField] Image healthBar;
+    InventoryInteractor inventoryInteractor;
     
 
     private void Start()
     {
+        inventoryInteractor = Game.GetInteractor<InventoryInteractor>();
         target = WayPointController.points[0];
         health = startHealth;
         speed = startSpeed;
@@ -51,11 +54,16 @@ public class EnemyController : MonoBehaviour
     public void TakeDamage(float count)
     {
         health -= count;
-        healthBar.fillAmount = health / startHealth;
+        DrawHP();
         if(health <= 0)
         {
             Die();
         }
+    }
+
+    void DrawHP()
+    {
+        healthBar.fillAmount = health / startHealth;
     }
 
     public void Slow(float count)
@@ -65,6 +73,7 @@ public class EnemyController : MonoBehaviour
 
     void Die()
     {
+        inventoryInteractor.AddSupplies(suppliesValue);
         GameObject.Destroy(gameObject);
     }
 }

@@ -7,8 +7,8 @@ public class Bullet : MonoBehaviour
 {
     [SerializeField] protected float speed = 70f;
     int damage;
-    Transform target;
-    Vector3 dir;
+    protected Transform target;
+    Vector3 dir, lastTargetPos;
     [SerializeField] protected GameObject hitEffect;
 
     public void Init(Transform target, int damage)
@@ -18,15 +18,18 @@ public class Bullet : MonoBehaviour
     }
 
     protected virtual void Update()
-    {
-        transform.LookAt(target);
-
+    {       
         if (target == null)
         {
-            GameObject.Destroy(gameObject, 3f);
-            return;
+            transform.LookAt(target);
+            dir = lastTargetPos;
+            GameObject.Destroy(gameObject, 4f);
         }
-        dir = (target.position - transform.position);
+        else
+        {
+            lastTargetPos = target.position - transform.position;
+            dir = (target.position - transform.position);
+        }
         float distancePerFrame = speed * Time.deltaTime;
 
         if(dir.magnitude <= distancePerFrame)
@@ -35,6 +38,7 @@ public class Bullet : MonoBehaviour
             return;
         }
         transform.Translate(dir.normalized * distancePerFrame, Space.World);
+        transform.rotation = Quaternion.LookRotation(dir);
     }
 
     protected virtual void Hit()
@@ -42,7 +46,7 @@ public class Bullet : MonoBehaviour
         HitEffect();
         GameObject.Destroy(gameObject);
 
-        Damage(target);
+        if(target != null) Damage(target);
     }
 
     protected virtual void Damage(Transform target)

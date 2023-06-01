@@ -111,3 +111,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   selectionColor: {r: 0, g: 0.9137726, b: 1, a: 0}
+  reloadColor: {r: 0, g: 1, b: 0.08155513, a: 0}

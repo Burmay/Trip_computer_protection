@@ -464,4 +464,5 @@ MonoBehaviour:
   offset: 0.2
   health: 0
   startHealth: 100
+  suppliesValue: 5
   healthBar: {fileID: 6954466934548471645}

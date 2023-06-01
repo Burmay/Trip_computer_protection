@@ -6,10 +6,11 @@ using UnityEngine.EventSystems;
 public class TowerSlotController : MonoBehaviour
 {
     [SerializeField] Color selectionColor;
+    [SerializeField] Color reloadColor;
 
     Renderer render;
     Color startColor;
-    TurretController turret;
+    TurretBase turret;
     BuildInteractor buildInteractor;
 
     // Start is called before the first frame update
@@ -20,11 +21,16 @@ public class TowerSlotController : MonoBehaviour
         buildInteractor = Game.GetInteractor<BuildInteractor>();
     }
 
-     void OnMouseEnter()
+    void OnMouseEnter()
     {
-        if (buildInteractor.CanBuild)
+        if (buildInteractor.CanBuild && turret == null)
         {
             render.material.color = selectionColor;
+        }
+
+        if (turret != null && turret.off)
+        {
+            render.material.color = reloadColor;
         }
     }
 
@@ -35,10 +41,14 @@ public class TowerSlotController : MonoBehaviour
 
     private void OnMouseDown()
     {
+        if (turret != null && turret.off)
+        {
+            turret.Reload(); return;
+        }
         if (turret != null || buildInteractor.turretToBuild.Prefab == null) return;
         if (EventSystem.current.IsPointerOverGameObject()) return;
 
-        turret =  buildInteractor.BuildTurret(this);
+        turret = buildInteractor.BuildTurret(this);
     }
 
 }

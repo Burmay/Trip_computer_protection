@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MGTurretController : TurretController
+public class MGTurretController : TurretBase
 {
     protected override void Start()
     {

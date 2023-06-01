@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEditor.iOS;
 using UnityEngine;
 
@@ -15,9 +16,9 @@ public class BuildInteractor : Interactor
     public TurretBluePrint mGTurretBP { get; private set; }
     public TurretBluePrint rocketLauncherBP { get; private set; }
     public TurretBluePrint laserTurretBP { get; private set; }
-
-
     public TurretBluePrint turretToBuild { private set; get; }
+    public List<TurretBase> turrets { get; private set; }
+
 
     public override void OnStart()
     {
@@ -32,7 +33,8 @@ public class BuildInteractor : Interactor
         laserTurretPrefab = Resources.Load< GameObject>(PATH_LASER);
 
         inventoryInteractor = Game.GetInteractor<InventoryInteractor>();
-        
+
+        turrets = new List<TurretBase>();
     }
 
     void SetTurretType()
@@ -59,13 +61,14 @@ public class BuildInteractor : Interactor
 
     public bool CanBuild { get { return turretToBuild.Prefab != null; } }
 
-    public TurretController BuildTurret(TowerSlotController slot)
+    public TurretBase BuildTurret(TowerSlotController slot)
     {
         if (inventoryInteractor.Money - turretToBuild.Cost < 0) return null;
         inventoryInteractor.SpendMoney(turretToBuild.Cost);
         Vector3 pos = new Vector3(slot.transform.position.x, slot.transform.position.y + turretToBuild.offsetY, slot.transform.position.z);
         GameObject instance = Instantiate(turretToBuild.Prefab, pos, Quaternion.identity);
-        var turret = instance.GetComponent<TurretController>();
+        var turret = instance.GetComponent<TurretBase>();
+        turrets.Add(turret);
         return turret;
     }
 
